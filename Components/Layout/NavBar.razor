@@ -1,0 +1,100 @@
+﻿<div class="sub-header">
+    <div class="sub-header-container">
+        <ul class="left-info">
+            <li>
+                <span class="icon">
+                    <!-- clock -->
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="64" height="64" viewBox="0 0 24 24"
+                         fill="white" stroke="white" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round"
+                         aria-hidden="true" role="img">
+                        <circle cx="12" cy="12" r="10" fill="none" stroke="white" />
+                        <line x1="12" y1="12" x2="12" y2="7" />
+                        <line x1="12" y1="12" x2="16" y2="14" />
+                    </svg>
+                </span>
+                <a href="#">H - P 06:00-23:00 | Szo-V 08:00-22:00</a>
+            </li>
+            <li>
+                <span class="icon">
+                    <!-- phone -->
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24 11.36 11.36 0 0 0 3.56.57 1 1 0 0 1 1 1v3.59a1 1 0 0 1-1 1A17.99 17.99 0 0 1 2.5 4a1 1 0 0 1 1-1H7.1a1 1 0 0 1 1 1c0 1.24.2 2.43.57 3.56a1 1 0 0 1-.25 1.02l-1.8 1.8Z" /></svg>
+                </span>
+                <a href="+36301234567">06 30 123 4567</a>
+            </li>
+        </ul>
+
+        <ul class="right-icons">
+            <li><a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M13 10h2.8l.4-3H13V5.3c0-.9.3-1.5 1.6-1.5h1.6V1.1C15.9.9 15 .75 14 .75 11.7.75 10 2.2 10 5v2H7v3h3v9h3v-9Z" /></svg></a></li>
+            <li><a href="#" aria-label="Twitter/X"><svg viewBox="0 0 24 24"><path d="M3 3l8.2 10.6L3.7 21h2.3l5.9-5.9 4.7 5.9H21l-8.6-10.8L20.3 3H18l-5.4 5.4L8.4 3H3Z" /></svg></a></li>
+            <li><a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM.5 8h4V23h-4V8zm7.5 0h3.8v2.05h.05c.53-1.01 1.84-2.08 3.78-2.08C19.8 7.97 22 10 22 13.72V23h-4v-8.1c0-1.93-.03-4.41-2.69-4.41-2.69 0-3.1 2.1-3.1 4.27V23H8V8z" /></svg></a></li>
+            <li><a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M7 2C4.2 2 2 4.2 2 7v10c0 2.8 2.2 5 5 5h10c2.8 0 5-2.2 5-5V7c0-2.8-2.2-5-5-5H7zm10 2c1.7 0 3 1.3 3 3v10c0 1.7-1.3 3-3 3H7c-1.7 0-3-1.3-3-3V7c0-1.7 1.3-3 3-3h10zm-5 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm4.5-.9a1.1 1.1 0 1 0 0-2.2 1.1 1.1 0 0 0 0 2.2z" /></svg></a></li>
+        </ul>
+    </div>
+</div>
+
+@if (!OnlyTop)
+{
+    <header id="main-header" class="main-header">
+        <nav class="navbar">
+            <div class="navbar-container">
+                <div class="logo-container">
+                    <a class="navbar-brand" href="/" aria-label="Fitness Időpontfoglalás">
+                        <h2>Fitness időpontfoglalás</h2>
+                    </a>
+                </div>
+
+                <button class="navbar-toggler"
+                        aria-expanded="@menuOpen"
+                        aria-controls="navbar-menu"
+                        aria-label="Toggle navigation"
+                        @onclick="ToggleMenu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div id="navbar-menu" class="navbar-collapse @(menuOpen ? " open" : "")">
+                    <ul class="navbar-nav">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="#top">Kezdőlap<span class="sr-only">(aktuális)</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#services">Szolgáltatások</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#stats">Eredmények</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#about">Rólunk</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#contact">Kapcsolat</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link rent-link" href="/rental">Időpont</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+}
+
+@inject IJSRuntime JS
+@code {
+    [Parameter]
+    public bool OnlyTop { get; set; } = false;
+
+    private bool menuOpen;
+    private void ToggleMenu() => menuOpen = !menuOpen;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("navbarScrollInit");
+            await JS.InvokeVoidAsync("navSpyInit");
+        }
+    }
+}
