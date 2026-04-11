@@ -1,0 +1,19 @@
+﻿<section class="hero" @attributes="AdditionalAttributes">
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+        <h6 class="hero-eyebrow">PROFESSZIONÁLIS EDZÉS</h6>
+        <h1 class="hero-title">Személyi edzés és fitness időpontfoglalás</h1>
+        <p class="hero-desc">
+            Tapasztalt edzők, személyre szabott edzéstervek rövid és hosszú távra.
+            Gyors időpontfoglalás online, rugalmas időbeosztással.
+            Válaszd ki a céljaidhoz illő edzést, a fejlődésben pedig segítünk.
+        </p>
+        <a href="/rental" class="hero-btn">Foglalj időpontot</a>
+    </div>
+</section>
+
+@code {
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}

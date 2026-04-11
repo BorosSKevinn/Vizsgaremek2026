@@ -1,0 +1,225 @@
+﻿.hero {
+    position: relative;
+    min-height: 95vh;
+    display: grid;
+    place-items: center;
+    background-image: url('/images/hero-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom right, rgba(0,0,0,.55), rgba(0,0,0,.35));
+    z-index: 0;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 24px;
+    box-sizing: border-box;
+    color: #fff;
+    text-align: left;
+}
+
+.hero-eyebrow {
+    margin-bottom: 15px;
+    font-size: 22px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--primary-color);
+}
+
+.hero-title {
+    margin: 0 0 30px;
+    text-transform: uppercase;
+    font-size: clamp(28px, 5vw, 44px);
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    overflow: hidden;
+}
+
+.hero-desc {
+    margin: 0 0 32px;
+    max-width: 570px;
+    font-size: 15px;
+    line-height: 1.9;
+    color: #f1f1f1;
+}
+
+.hero-link {
+    color: #a4c639;
+    text-decoration: underline;
+}
+
+.hero-btn {
+    display: inline-block;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    background: var(--primary-color);
+    color: #fff;
+    text-decoration: none;
+    transition: .25s ease;
+    border: 2px solid var(--primary-color);
+}
+
+    .hero-btn:hover {
+        background: #fff;
+        color: var(--primary-color);
+    }
+
+@media (max-width: 768px) {
+    .hero-eyebrow {
+        font-size: 16px;
+    }
+
+    .hero-title {
+        font-size: clamp(24px, 7vw, 32px);
+        line-height: 1.2;
+    }
+
+    .hero-desc {
+        line-height: 1.7;
+    }
+}
+
+.hero-eyebrow,
+.hero-title,
+.hero-desc,
+.hero-btn {
+    opacity: 0;
+    transform: translateY(14px);
+    will-change: transform, opacity;
+    animation: revealUp .8s var(--ease-out) forwards;
+}
+
+.hero-title {
+    animation-delay: .4s;
+}
+
+.hero-desc {
+    animation-delay: 0.8s;
+}
+
+.hero-btn {
+    animation-delay: 1.2s;
+}
+
+@keyframes revealUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+    .hero-overlay::after {
+        content: "";
+        position: absolute;
+        inset: -20% -60%;
+        background: linear-gradient(100deg, transparent 45%, rgba(255,255,255,.14) 50%, transparent 55%);
+        transform: translateX(-60%);
+        animation: sweep 7s ease-in-out infinite;
+        mix-blend-mode: screen;
+        pointer-events: none;
+    }
+
+@keyframes sweep {
+    0% {
+        transform: translateX(-60%);
+    }
+
+    100% {
+        transform: translateX(60%);
+    }
+}
+
+.hero-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(80% 60% at 30% 10%, rgba(164,198,57,.08), transparent 60%);
+    opacity: .6;
+    animation: floatGlow 9s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+@keyframes floatGlow {
+    from {
+        transform: translateY(-2%);
+        opacity: .55;
+    }
+
+    to {
+        transform: translateY(2%);
+        opacity: .75;
+    }
+}
+
+.hero-btn {
+    position: relative;
+    isolation: isolate;
+}
+
+    .hero-btn::after {
+        content: "";
+        position: absolute;
+        inset: -6px;
+        border-radius: 999px;
+        border: 8px solid var(--primary-color, #a4c639);
+        opacity: 0;
+        animation: ring 2.6s ease-out 1.4s infinite;
+        pointer-events: none;
+    }
+
+@keyframes ring {
+    0% {
+        transform: scale(.85);
+        opacity: .85;
+    }
+
+    70% {
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1.25);
+        opacity: 0;
+    }
+}
+
+.hero-btn:hover {
+    transform: translateY(-2px);
+    transition: transform .25s var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero, .hero * {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .hero-overlay::before,
+    .hero-overlay::after,
+    .hero-btn::after {
+        display: none !important;
+    }
+}

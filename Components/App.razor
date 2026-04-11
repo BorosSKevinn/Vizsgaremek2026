@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
     <ResourcePreloader />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["Vizsgaremek2026.styles.css"]" />
     <ImportMap />
@@ -13,9 +14,11 @@
 </head>
 
 <body>
-    <Routes />
+    <Routes @rendermode="InteractiveServer"/>
     <ReconnectModal />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script src="observer.js"></script>
+    <script src="requestBar.js"></script>
 </body>
 
 </html>

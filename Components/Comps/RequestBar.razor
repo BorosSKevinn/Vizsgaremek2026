@@ -1,0 +1,28 @@
+﻿<section class="request-bar">
+    <div class="request-bar-container">
+        <div class="request-bar-text">
+            <h4>Kérj visszahívást most!</h4>
+            <span>Add meg az elérhetőséged, és edzőnk rövid időn belül felveszi veled a kapcsolatot.</span>
+        </div>
+
+        <a href="#contact" class="request-bar-btn">Kapcsolat</a>
+    </div>
+</section>
+
+@inject IJSRuntime JS
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (true)
+        {
+            await JS.InvokeVoidAsync("requestBar.init", new
+            {
+                selector = ".request-bar",
+                threshold = 0.35,
+                rootMargin = "0px 0px -25% 0px",
+                once = true,
+                className = "is-inview"
+            });
+        }
+    }
+}
