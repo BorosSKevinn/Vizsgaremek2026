@@ -1,5 +1,48 @@
-﻿<h3>FunFacts</h3>
+﻿<section class="fun-facts" @attributes="AdditionalAttributes">
+    <div class="overlay"></div>
+
+    <div class="fun-facts-container">
+        <!-- Bal -->
+        <div class="fun-facts-left observe-animate fade-slide-left">
+            <span>Miért válassz minket?</span>
+            <h2>Megoldásaink a <em>hatékony fejlődéshez</em></h2>
+            <p>
+                Szakképzett edzőink segítenek a céljaid elérésében, legyen szó fogyásról, izomépítésről vagy állóképesség javításáról.
+                Modern szemlélettel és személyre szabott programokkal dolgozunk.
+                <br><br>
+                Rugalmas időpontok, online foglalás és folyamatos támogatás – minden adott a sikeres fejlődéshez.
+            </p>
+            <a href="/about" class="fun-facts-btn">Tudj meg többet</a>
+        </div>
+
+        <!-- Jobb -->
+        <div class="fun-facts-right">
+            <div class="counts-grid observe-animate fade-slide-in">
+                <div class="count-area-content">
+                    <div class="count-digit">1500+</div>
+                    <div class="count-title">Ledolgozott edzésóra</div>
+                </div>
+
+                <div class="count-area-content">
+                    <div class="count-digit">1200+</div>
+                    <div class="count-title">Elégedett vendég</div>
+                </div>
+
+                <div class="count-area-content">
+                    <div class="count-digit">800+</div>
+                    <div class="count-title">Elért cél</div>
+                </div>
+
+                <div class="count-area-content">
+                    <div class="count-digit">10+</div>
+                    <div class="count-title">Év tapasztalat</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 @code {
-
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

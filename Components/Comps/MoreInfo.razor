@@ -1,5 +1,28 @@
-﻿<h3>MoreInfo</h3>
+﻿<section class="more-info" @attributes="AdditionalAttributes">
+    <div class="more-info-container observe-animate bounce-in">
+        <div class="more-info-content">
+            <div class="more-info-grid">
+                <div class="left-image">
+                    <img src="https://images.pexels.com/photos/2294363/pexels-photo-2294363.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=800&h=800" alt="Fitness szolgáltatás - több információ" />
+                </div>
+
+                <div class="right-content">
+                    <span>Kik vagyunk</span>
+                    <h2>Ismerd meg <em>csapatunkat</em></h2>
+                    <p>
+                        Személyi edzést és fitness szolgáltatásokat kínálunk minden szinten.
+                        Legyen szó kezdőkről vagy haladókról, nálunk mindenki megtalálja a számára ideális programot.
+                        <br><br>
+                        Fontos számunkra, hogy vendégeink hatékonyan, biztonságosan és motiváló környezetben fejlődjenek.
+                    </p>
+                    <a href="/about-page" class="more-info-btn">Tudj meg többet</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 @code {
-
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

@@ -1,5 +1,50 @@
-﻿<h3>Services</h3>
+﻿<section class="services" @attributes="AdditionalAttributes">
+    <div class="services-container">
+
+        <header class="section-heading">
+            <h2 class="observe-animate fade-slide-left">Szolgáltatásaink</h2>
+            <span class="observe-animate fade-slide-left">Személyi edzés és kiegészítő fitness szolgáltatások</span>
+        </header>
+
+        <div class="services-grid">
+            <!-- Card 1 -->
+            <article class="service-item observe-animate jack-in-the-box">
+                <img src="https://images.pexels.com/photos/3768916/pexels-photo-3768916.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&dpr=1" alt="Személyi edzés" class="service-image" />
+                <div class="service-down-content">
+                    <h4 class="observe-animate bounce-in">Személyi edzés</h4>
+                    <p class="observe-animate bounce-in">Egyéni edzéstervek és személyes támogatás a céljaid eléréséhez, kezdőknek és haladóknak egyaránt.</p>
+                    <a href="#" class="service-btn">Tudj meg többet</a>
+                </div>
+            </article>
+
+            <!-- Card 2 -->
+            <article class="service-item observe-animate jack-in-the-box">
+                <img src="https://images.pexels.com/photos/2261485/pexels-photo-2261485.jpeg" alt="Csoportos órák" class="service-image" />
+                <div class="service-down-content">
+                    <h4 class="observe-animate bounce-in">Csoportos órák</h4>
+                    <p class="observe-animate bounce-in">
+                        Motiváló közösségben végezhető edzések, mint például jóga, erősítés vagy funkcionális tréning.
+                        Válassz számodra ideális időpontot és csatlakozz!
+                    </p>
+                    <a href="#" class="service-btn">Tudj meg többet</a>
+                </div>
+            </article>
+
+            <!-- Card 3 -->
+            <article class="service-item observe-animate jack-in-the-box">
+                <img src="https://images.pexels.com/photos/416809/pexels-photo-416809.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&dpr=1" alt="Edzői tanácsadás" class="service-image" />
+                <div class="service-down-content">
+                    <h4 class="observe-animate bounce-in">Edzői tanácsadás</h4>
+                    <p class="observe-animate bounce-in">Segítünk a megfelelő edzésprogram kiválasztásában, és hasznos tanácsokat adunk az életmódváltáshoz.</p>
+                    <a href="#" class="service-btn">Tudj meg többet</a>
+                </div>
+            </article>
+        </div>
+
+    </div>
+</section>
 
 @code {
-
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }
