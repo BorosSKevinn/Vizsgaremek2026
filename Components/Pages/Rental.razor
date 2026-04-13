@@ -1,0 +1,469 @@
+@page "/rental"
+@using System.Globalization
+@using Microsoft.JSInterop
+@using Vizsgaremek2026.Models
+@using Vizsgaremek2026.Services
+@inject IOrderStateService OrderState
+@inject IRentalService RentalService
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+
+<section class="rent-hero">
+    <div class="rent-hero-inner">
+        <h1>Edzések foglalása</h1>
+        <p>Személyi edzés, csoportos órák és funkcionális tréningek – fejlődj hatékonyan, profi környezetben.</p>
+    </div>
+</section>
+
+<section class="rent-page">
+    <div class="rent-container">
+        <aside class="rent-filters">
+            <h3 class="filters-title">Szűrők</h3>
+
+            <div class="filter-group">
+                <label for="search">Keresés</label>
+                <input id="search" class="input" type="text" placeholder="Edzés neve, típus, címke..."
+                       value="@searchText"
+                       @oninput="OnSearchChanged">
+            </div>
+
+            <div class="filter-group">
+                <label for="category">Edzés típusa</label>
+                <select id="category" class="input" @onchange="OnCategoryChanged">
+                    <option value="">Mind</option>
+                    <option>Személyi edzés</option>
+                    <option>Csoportos óra</option>
+                    <option>Funkcionális tréning</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="min-cap">Férőhely (min.)</label>
+                <input id="min-cap" class="input" type="number" min="1" step="1" @oninput="OnMinCapacityChanged">
+            </div>
+
+            <button class="btn btn-reset" @onclick="ResetFilters">Szűrők törlése</button>
+        </aside>
+
+        <main class="rent-results">
+            <div class="cards-grid">
+                @foreach (var item in Filtered)
+                {
+                    <article class="card">
+                        <div class="card-media">
+                            <img src="@GetPexelsImage(item.ImageUrl)" alt="@item.Name">
+                            <div class="card-badges">
+                                <span class="badge badge-cat">@item.Category</span>
+                                <span class="badge">@(item.PricePerDay.ToString("0")) Ft / alkalom</span>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <header class="card-head">
+                                <h4 class="card-title">@item.Name</h4>
+                                <div class="rating" title="@($"{item.Rating:0.0}/5")">
+                                    @for (var i = 1; i <= 5; i++)
+                                    {
+                                        <svg viewBox="0 0 24 24" class="star @(i <= Math.Round(item.Rating) ? "on" : "")"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z" /></svg>
+                                    }
+                                </div>
+                            </header>
+
+                            <p class="card-desc">@item.Description</p>
+
+                            <ul class="card-tags">
+                                @foreach (var t in item.Tags)
+                                {
+                                    <li>@t</li>
+                                }
+                                <li>Max létszám: @item.Capacity</li>
+                            </ul>
+
+                            <div class="card-actions">
+                                <button class="btn btn-outline" @onclick="() => ShowBookingAsync(item)">Foglalás</button>
+                            </div>
+                        </div>
+                    </article>
+                }
+            </div>
+
+            @if (!Filtered.Any())
+            {
+                <div class="empty">
+                    <p>Nincs találat a megadott szűrőkre.</p>
+                </div>
+            }
+        </main>
+
+        <aside class="rent-booking" id="booking-panel">
+            <div class="booking-card">
+                <h3 class="booking-title">Időpont foglalás</h3>
+
+                @if (Selected is null)
+                {
+                    <p class="muted">Válassz egy edzést a listából, majd állítsd be az időpontot.</p>
+                }
+                else
+                {
+                    <div class="booking-selected">
+                        <img src="@GetPexelsImage(Selected.ImageUrl)" alt="@Selected.Name">
+                        <div>
+                            <h4>@Selected.Name</h4>
+                            <div class="booking-price"><strong>@Selected.PricePerDay.ToString("0") Ft</strong> / alkalom</div>
+                            <div class="booking-meta">@Selected.Category • Max létszám: @Selected.Capacity</div>
+                        </div>
+                    </div>
+
+                    <div class="booking-form">
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="b-day">Nap kiválasztása</label>
+                                <input id="b-day"
+                                       type="date"
+                                       class="input"
+                                       value="@selectedDayInput"
+                                       min="@MinBookingDate"
+                                       max="@MaxBookingDate"
+                                       @onchange="OnBookingDayChanged" />
+                                @if (BookingDayError is not null)
+                                {
+                                    <small class="field-error">@BookingDayError</small>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="b-hour">Óra kiválasztása</label>
+                                <select id="b-hour" class="input" value="@selectedHourLabel" @onchange="OnHourChanged" disabled="@(!bookDay.HasValue || AvailableHourSlots.Count == 0)">
+                                    <option value="">@(bookDay.HasValue ? "Válassz időpontot..." : "Előbb válassz napot")</option>
+                                    @foreach (var slot in AvailableHourSlots)
+                                    {
+                                        <option value="@SlotLabel(slot)">@SlotLabel(slot)</option>
+                                    }
+                                </select>
+                                @if (bookDay.HasValue && AvailableHourSlots.Count == 0)
+                                {
+                                    <small class="muted">Erre a napra már nincs szabad idősáv.</small>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="b-guests">Résztvevők száma</label>
+                                <input id="b-guests" type="number" class="input" min="1" max="@Selected.Capacity" step="1" value="@bookGuests" @oninput="OnGuestsChanged" />
+                            </div>
+                        </div>
+
+                        @if (BookingError is not null)
+                        {
+                            <div class="alert error">@BookingError</div>
+                        }
+
+                        @if (bookFrom.HasValue && bookTo.HasValue)
+                        {
+                            <div class="booking-summary">
+                                <div class="sum-line"><span>Foglalás ideje</span><strong>@bookFrom.Value.ToString("yyyy.MM.dd HH:mm") - @bookTo.Value.ToString("HH:mm")</strong></div>
+                                <div class="sum-line"><span>Részösszeg</span><strong>@SelectedSubtotal.ToString("0") Ft</strong></div>
+                                <div class="sum-line"><span>ÁFA (27%)</span><strong>@SelectedVat.ToString("0") Ft</strong></div>
+                                <div class="sum-total"><span>Végösszeg</span><strong>@SelectedTotal.ToString("0") Ft</strong></div>
+                            </div>
+                        }
+
+                        <div class="form-row" style="gap:.5rem;">
+                            <button class="btn btn-outline" @onclick="CancelSelected">Mégse</button>
+                            <button class="btn btn-primary" @onclick="AddSelectedToCartAsync" disabled="@(!CanContinueBooking)">Foglalás folytatása</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </aside>
+    </div>
+</section>
+
+@code {
+    private List<RentalItem> Items = new();
+    private List<RentalItem> Filtered = new();
+    private RentalItem? Selected;
+
+    private string searchText = string.Empty;
+    private string category = string.Empty;
+    private int? minCapacity;
+
+    private DateTime? bookDay;
+    private DateTime? bookFrom;
+    private DateTime? bookTo;
+    private int bookGuests = 1;
+    private string selectedDayInput = string.Empty;
+    private string? BookingDayError;
+    private string? BookingError;
+
+    private readonly List<TimeSpan> OpeningHourSlots = Enumerable.Range(6, 16).Select(h => new TimeSpan(h, 0, 0)).ToList();
+    private List<TimeSpan> AvailableHourSlots = new();
+    private string selectedHourLabel = string.Empty;
+
+    private HashSet<DateTime> depletedBookingDays = new();
+    private readonly DateTime maxBookableDay = DateTime.Today.AddMonths(2);
+    private string MinBookingDate => DateTime.Today.ToString("yyyy-MM-dd");
+    private string MaxBookingDate => maxBookableDay.ToString("yyyy-MM-dd");
+
+    private static readonly Dictionary<string, string> PexelsImageMap = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["images/products/fenykep_3.1.1.jpg"] = "https://images.pexels.com/photos/1552252/pexels-photo-1552252.jpeg?auto=compress&cs=tinysrgb&w=1000&h=700&dpr=1",
+        ["images/products/fenykep_3.2.1.jpg"] = "https://images.pexels.com/photos/28054/pexels-photo-28054.jpg?auto=compress&cs=tinysrgb&w=1000&h=700&dpr=1",
+        ["images/products/fenykep_3.3.1.jpg"] = "https://images.pexels.com/photos/949126/pexels-photo-949126.jpeg?auto=compress&cs=tinysrgb&w=1000&h=700&dpr=1",
+        ["images/products/fenykep_3.4.1.jpg"] = "https://images.pexels.com/photos/1431282/pexels-photo-1431282.jpeg?auto=compress&cs=tinysrgb&w=1000&h=700&dpr=1",
+        ["images/products/fenykep_3.5.1.jpg"] = "https://images.pexels.com/photos/7690323/pexels-photo-7690323.jpeg?auto=compress&cs=tinysrgb&w=1000&h=700&dpr=1",
+        ["images/products/fenykep_3.6.1.jpg"] = "https://images.pexels.com/photos/6453398/pexels-photo-6453398.jpeg?auto=compress&cs=tinysrgb&w=1000&h=700&dpr=1"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await OrderState.ClearOrderAsync();
+        Items = await RentalService.GetAllRentalItemsAsync();
+        ApplyFilters();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("navbarScrollInit");
+            await JS.InvokeVoidAsync("navSpyInit");
+        }
+
+        return;
+    }
+
+    private async Task OnBookingDayChanged(ChangeEventArgs e)
+    {
+        selectedDayInput = e.Value?.ToString() ?? string.Empty;
+        BookingDayError = null;
+        BookingError = null;
+
+        if (!DateTime.TryParseExact(selectedDayInput, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedDay))
+        {
+            ResetSelectedBookingDay();
+            return;
+        }
+
+        var chosenDay = parsedDay.Date;
+        if (chosenDay < DateTime.Today || chosenDay > maxBookableDay)
+        {
+            BookingDayError = "A kiválasztott dátum kívül esik a foglalható időszakon.";
+            selectedDayInput = string.Empty;
+            ResetSelectedBookingDay();
+            return;
+        }
+
+        if (depletedBookingDays.Contains(chosenDay))
+        {
+            BookingDayError = "Erre a napra már nincs szabad idősáv. Kérlek válassz másik napot.";
+            selectedDayInput = string.Empty;
+            ResetSelectedBookingDay();
+            return;
+        }
+
+        bookDay = chosenDay;
+        selectedHourLabel = string.Empty;
+        bookFrom = null;
+        bookTo = null;
+
+        if (Selected is not null)
+        {
+            var unavailableSlots = await RentalService.GetUnavailableHourSlotsAsync(Selected.Id, bookDay.Value);
+            AvailableHourSlots = OpeningHourSlots
+                .Where(slot => !unavailableSlots.Contains(slot))
+                .ToList();
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task ShowBookingAsync(RentalItem item)
+    {
+        Selected = item;
+        ResetSelectedBookingDay();
+        bookDay = null;
+        bookFrom = null;
+        bookTo = null;
+        bookGuests = 1;
+        selectedHourLabel = string.Empty;
+        AvailableHourSlots = new();
+        BookingError = null;
+        BookingDayError = null;
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private Task OnHourChanged(ChangeEventArgs e)
+    {
+        selectedHourLabel = e.Value?.ToString() ?? string.Empty;
+
+        if (!bookDay.HasValue || !TimeSpan.TryParse(selectedHourLabel, out var selectedHour))
+        {
+            bookFrom = null;
+            bookTo = null;
+            return Task.CompletedTask;
+        }
+
+        bookFrom = bookDay.Value.Add(selectedHour);
+        bookTo = bookFrom.Value.AddHours(1);
+        return Task.CompletedTask;
+    }
+
+    private async Task AddSelectedToCartAsync()
+    {
+        BookingError = null;
+
+        if (Selected is null)
+        {
+            BookingError = "Nincs kiválasztott tétel.";
+            return;
+        }
+
+        if (!bookFrom.HasValue || !bookTo.HasValue)
+        {
+            BookingError = "Először válassz napot és egy szabad órát.";
+            return;
+        }
+
+        if (bookTo.Value <= bookFrom.Value || bookTo.Value.Date != bookFrom.Value.Date || (bookTo.Value - bookFrom.Value) != TimeSpan.FromHours(1))
+        {
+            BookingError = "A foglalásnak pontosan 1 órásnak kell lennie ugyanazon a napon.";
+            return;
+        }
+
+        if (bookGuests < 1 || bookGuests > Selected.Capacity)
+        {
+            BookingError = $"A résztvevők száma 1 és {Selected.Capacity} között lehet.";
+            return;
+        }
+
+        var isAvailable = await RentalService.IsAvailableAsync(Selected.Id, bookFrom.Value, bookTo.Value, bookGuests);
+        if (!isAvailable)
+        {
+            BookingError = "Ez az órasáv már nem elérhető. Kérlek válassz másikat.";
+            return;
+        }
+
+        await OrderState.AddRentalItemAsync(Selected.Id, Selected.Name, Selected.PricePerDay, bookFrom.Value, bookTo.Value, bookGuests);
+        Navigation.NavigateTo("/szamlazasi-adatok");
+    }
+
+    private void CancelSelected()
+    {
+        Selected = null;
+        bookDay = null;
+        bookFrom = null;
+        bookTo = null;
+        selectedHourLabel = string.Empty;
+        selectedDayInput = string.Empty;
+        AvailableHourSlots = new();
+        BookingError = null;
+        BookingDayError = null;
+        depletedBookingDays = new();
+    }
+
+    private void ResetSelectedBookingDay()
+    {
+        bookDay = null;
+        selectedHourLabel = string.Empty;
+        bookFrom = null;
+        bookTo = null;
+        AvailableHourSlots = new();
+    }
+
+    private string GetPexelsImage(string? imageUrl)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl))
+        {
+            return "https://images.pexels.com/photos/2261485/pexels-photo-2261485.jpeg?auto=compress&cs=tinysrgb&w=1000&h=700&dpr=1";
+        }
+
+        if (imageUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+        {
+            return imageUrl;
+        }
+
+        var normalized = imageUrl.TrimStart('/');
+        return PexelsImageMap.TryGetValue(normalized, out var mapped)
+            ? mapped
+            : "https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg?auto=compress&cs=tinysrgb&w=1000&h=700&dpr=1";
+    }
+
+    private bool CanContinueBooking => Selected is not null
+                                      && bookFrom.HasValue
+                                      && bookTo.HasValue
+                                      && bookGuests >= 1
+                                      && bookGuests <= Selected.Capacity;
+    private decimal SelectedSubtotal => Selected is null ? 0 : Selected.PricePerDay * bookGuests;
+    private decimal SelectedVat => SelectedSubtotal * 0.27m;
+    private decimal SelectedTotal => SelectedSubtotal + SelectedVat;
+
+    private static string SlotLabel(TimeSpan slot) => $"{slot:hh\\:mm}";
+
+    private Task OnGuestsChanged(ChangeEventArgs e)
+    {
+        BookingError = null;
+
+        if (Selected is null)
+        {
+            bookGuests = 1;
+            return Task.CompletedTask;
+        }
+
+        if (!int.TryParse(e.Value?.ToString(), out var parsed))
+        {
+            bookGuests = 1;
+            return Task.CompletedTask;
+        }
+
+        bookGuests = Math.Clamp(parsed, 1, Selected.Capacity);
+        return Task.CompletedTask;
+    }
+
+    private Task OnSearchChanged(ChangeEventArgs e)
+    {
+        searchText = e.Value?.ToString() ?? string.Empty;
+        ApplyFilters();
+        return Task.CompletedTask;
+    }
+
+    private Task OnCategoryChanged(ChangeEventArgs e)
+    {
+        category = e.Value?.ToString() ?? string.Empty;
+        ApplyFilters();
+        return Task.CompletedTask;
+    }
+
+    private Task OnMinCapacityChanged(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+        minCapacity = int.TryParse(value, out var parsed) ? parsed : null;
+        ApplyFilters();
+        return Task.CompletedTask;
+    }
+
+    private void ResetFilters()
+    {
+        searchText = string.Empty;
+        category = string.Empty;
+        minCapacity = null;
+        ApplyFilters();
+    }
+
+    private void ApplyFilters()
+    {
+        Filtered = Items.Where(i =>
+            (string.IsNullOrWhiteSpace(searchText)
+             || i.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase)
+             || i.Description.Contains(searchText, StringComparison.OrdinalIgnoreCase)
+             || i.Tags.Any(t => t.Contains(searchText, StringComparison.OrdinalIgnoreCase)))
+            && (string.IsNullOrWhiteSpace(category) || i.Category.Equals(category, StringComparison.OrdinalIgnoreCase))
+            && (!minCapacity.HasValue || i.Capacity >= minCapacity.Value)
+        ).ToList();
+    }
+
+}

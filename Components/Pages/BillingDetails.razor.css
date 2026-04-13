@@ -1,0 +1,148 @@
+.billing-page {
+    background: linear-gradient(180deg, #f5f7ff 0%, #f8fafc 100%);
+    min-height: calc(100vh - 80px);
+    padding: 2rem 1rem 3rem;
+}
+
+.billing-shell {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.billing-header h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: #131a2a;
+}
+
+.billing-header p {
+    margin-top: .5rem;
+    color: #4f5b76;
+}
+
+.billing-grid {
+    margin-top: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 1rem;
+}
+
+.summary-card,
+.form-card,
+.empty-card {
+    background: #fff;
+    border-radius: 18px;
+    border: 1px solid #e6ebf5;
+    box-shadow: 0 10px 40px rgba(15, 23, 42, 0.06);
+    padding: 1.25rem;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .85rem 0;
+    border-bottom: 1px solid #edf1f9;
+}
+
+.summary-item h4 {
+    margin: 0;
+}
+
+.summary-item p {
+    margin: .25rem 0;
+    color: #59627a;
+    font-size: .92rem;
+}
+
+.summary-total {
+    margin-top: 1rem;
+}
+
+.summary-total>div {
+    display: flex;
+    justify-content: space-between;
+    margin: .4rem 0;
+}
+
+.summary-total .grand {
+    margin-top: .7rem;
+    padding-top: .7rem;
+    border-top: 1px solid #edf1f9;
+    font-size: 1.1rem;
+}
+
+.field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .8rem;
+}
+
+.field-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    color: #1e2638;
+    font-weight: 600;
+    font-size: .93rem;
+}
+
+.field-grid input {
+    border: 1px solid #d8dfec;
+    border-radius: 10px;
+    padding: .65rem .75rem;
+}
+
+.actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: .6rem;
+}
+
+.btn-primary,
+.btn-ghost {
+    border: 0;
+    border-radius: 10px;
+    padding: .7rem 1rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #2962ff;
+    color: #fff;
+}
+
+.btn-primary:disabled {
+    opacity: .7;
+    cursor: wait;
+}
+
+.btn-ghost {
+    background: #eef2ff;
+    color: #26324d;
+}
+
+.alert {
+    border-radius: 10px;
+    padding: .7rem .9rem;
+    margin: .5rem 0 .8rem;
+}
+
+.alert.error {
+    color: #7a1021;
+    background: #ffe6ea;
+}
+
+.alert.success {
+    color: #0f5f2d;
+    background: #ddf8e8;
+}
+
+@media (max-width: 920px) {
+    .billing-grid,
+    .field-grid {
+        grid-template-columns: 1fr;
+    }
+}

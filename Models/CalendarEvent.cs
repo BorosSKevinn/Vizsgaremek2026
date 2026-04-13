@@ -1,4 +1,4 @@
-﻿namespace VizsgaremekDemo.Models
+﻿namespace Vizsgaremek2026.Models
 {
     public class CalendarEvent
     {

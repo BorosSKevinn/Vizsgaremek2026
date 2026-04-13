@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace VizsgaremekDemo.Models
+namespace Vizsgaremek2026.Models
 {
     public class RentalItem
     {

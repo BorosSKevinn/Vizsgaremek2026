@@ -1,3 +1,4 @@
+using Radzen;
 using Vizsgaremek2026.Components;
 using Vizsgaremek2026.Services;
 
@@ -13,7 +14,16 @@ namespace Vizsgaremek2026
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
+            builder.Services.AddRadzenComponents();
+
+            builder.Services.AddControllers();
+
+            builder.Services.AddScoped<IMySqlDatabaseService, MySqlDatabaseService>();
+
             builder.Services.AddScoped<ReviewService>();
+            builder.Services.AddScoped<EmailService>();
+            builder.Services.AddScoped<IRentalService, RentalService>();
+            builder.Services.AddScoped<IOrderStateService, OrderStateService>();
             builder.Services.AddScoped<HttpClient>();
 
             var app = builder.Build();

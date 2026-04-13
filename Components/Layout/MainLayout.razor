@@ -1,9 +1,32 @@
 ﻿@using Vizsgaremek2026.Components.Comps
 @inherits LayoutComponentBase
+@inject NavigationManager Navigation
 
-<NavBar />
-@Body
-<Footer />
+<div>
+    @if (Navigation.Uri.Contains("privacy"))
+    {
+        @Body
+    }
+    else if (Navigation.Uri.Contains("rental"))
+    {
+        <NavBar OnlyTop=true />
+        @Body
+        <Footer />
+    }
+    else if (Navigation.Uri.Contains("szamlazasi-adatok") ||
+    Navigation.Uri.Contains("rental-success") ||
+    Navigation.Uri.Contains("admin"))
+    {
+        <NavBar OnlyTop=true />
+        @Body
+    }
+    else
+    {
+        <NavBar />
+        @Body
+        <Footer />
+    }
+</div>
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.

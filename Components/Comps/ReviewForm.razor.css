@@ -87,7 +87,6 @@
     margin-left: 8px;
 }
 
-/* TÁVOLÍTSD EL a :hover és :hover ~ .star színezést! */
 .rating-stars {
     display: flex;
     align-items: center;
@@ -98,16 +97,22 @@
 }
 
     .rating-stars .star {
-        color: #ccc; /* alap szín */
+        color: #ccc; 
+        
+        
+        
+        alap szín */
         cursor: pointer;
         transition: transform .12s ease;
     }
 
-        .rating-stars .star.filled { /* CSAK ez színez */
+        .rating-stars .star.filled { 
+            
+            CSAK ez színez */
             color: var(--primary-color);
         }
 
-        .rating-stars .star:hover { /* ha akarsz animot, de ne színezzen */
+        .rating-stars .star:hover {
             transform: scale(1.06);
         }
 

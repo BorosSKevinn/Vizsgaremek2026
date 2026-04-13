@@ -1,0 +1,266 @@
+@page "/szamlazasi-adatok"
+@using System.ComponentModel.DataAnnotations
+@using Vizsgaremek2026.Models
+@using Vizsgaremek2026.Services
+@inject IOrderStateService OrderState
+@inject IRentalService RentalService
+@inject NavigationManager Navigation
+
+<PageTitle>Foglalás véglegesítése</PageTitle>
+
+<section class="billing-page">
+    <div class="billing-shell">
+        <div class="billing-header">
+            <h1>Foglalás véglegesítése</h1>
+            <p>Ellenőrizd az összesítést, majd add meg a számlázási adataidat.</p>
+        </div>
+
+        @if (!OrderItems.Any())
+        {
+            <div class="empty-card">
+                <h3>Nincs aktív foglalásod</h3>
+                <p>Először válassz ki egy időpontot a rental oldalon.</p>
+                <button class="btn-primary" type="button" @onclick="GoBack">Vissza a foglaláshoz</button>
+            </div>
+        }
+        else
+        {
+            <div class="billing-grid">
+                <section class="summary-card">
+                    <h3>Foglalási összesítő</h3>
+
+                    @foreach (var item in OrderItems)
+                    {
+                        <article class="summary-item">
+                            <div>
+                                <h4>@item.Name</h4>
+                                <p>@item.RentalStartDate – @item.RentalEndDate</p>
+                                <p>Mennyiség: @item.Quantity fő</p>
+                            </div>
+                            <strong>@item.Price.ToString("N0") Ft</strong>
+                        </article>
+                    }
+
+                    <div class="summary-total">
+                        <div><span>Nettó összesen</span><strong>@Subtotal.ToString("N0") Ft</strong></div>
+                        <div><span>ÁFA (27%)</span><strong>@Vat.ToString("N0") Ft</strong></div>
+                        <div class="grand"><span>Végösszeg</span><strong>@Total.ToString("N0") Ft</strong></div>
+                    </div>
+                </section>
+
+                <section class="form-card">
+                    <h3>Számlázási adatok</h3>
+
+                    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+                    {
+                        <div class="alert error">@ErrorMessage</div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(SuccessMessage))
+                    {
+                        <div class="alert success">@SuccessMessage</div>
+                    }
+
+                    <form @onsubmit="SubmitAsync" @onsubmit:preventDefault>
+                        <div class="field-grid">
+                            <label>
+                                Teljes név
+                                <input type="text" name="FullName" class="input" @bind="BillingForm.FullName" />
+                            </label>
+
+                            <label>
+                                E-mail
+                                <input type="email" name="Email" class="input" @bind="BillingForm.Email" />
+                            </label>
+
+                            <label>
+                                Telefonszám
+                                <input type="text" name="Phone" class="input" @bind="BillingForm.Phone" />
+                            </label>
+
+                            <label>
+                                Irányítószám
+                                <input type="text" name="PostalCode" class="input" @bind="BillingForm.PostalCode" />
+                            </label>
+
+                            <label>
+                                Város
+                                <input type="text" name="City" class="input" @bind="BillingForm.City" />
+                            </label>
+
+                            <label>
+                                Cím
+                                <input type="text" name="Address" class="input" @bind="BillingForm.Address" />
+                            </label>
+
+                            <label>
+                                Adószám (opcionális)
+                                <input type="text" name="VatNumber" class="input" @bind="BillingForm.VatNumber" />
+                            </label>
+                        </div>
+
+                        <div class="actions">
+                            <button type="button" class="btn-ghost" @onclick="GoBack">Vissza</button>
+                            <button type="submit" class="btn-primary" disabled="@isSubmitting">
+                                @(isSubmitting ? "Mentés..." : "Foglalás véglegesítése")
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    private List<OrderItem> OrderItems = new();
+    private BillingDetailsInputModel BillingForm = new();
+    private string? ErrorMessage;
+    private string? SuccessMessage;
+    private bool isSubmitting;
+
+    private decimal Subtotal => OrderItems.Sum(i => i.Price);
+    private decimal Vat => Subtotal * 0.27m;
+    private decimal Total => Subtotal + Vat;
+
+    protected override async Task OnInitializedAsync()
+    {
+        OrderItems = await OrderState.GetOrderItemsAsync();
+
+        var storedBilling = await OrderState.GetBillingDetailsAsync();
+        if (storedBilling is not null)
+        {
+            BillingForm = new BillingDetailsInputModel
+            {
+                FullName = storedBilling.FullName,
+                Email = storedBilling.Email,
+                Phone = storedBilling.Phone,
+                PostalCode = storedBilling.PostalCode,
+                City = storedBilling.City,
+                Address = storedBilling.Address,
+                VatNumber = storedBilling.VatNumber
+            };
+        }
+    }
+
+    private void GoBack() => Navigation.NavigateTo("/rental");
+
+    private async Task RedirectBack()
+    {
+        await Task.Delay(3000);
+        Navigation.NavigateTo("/");
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (isSubmitting)
+            return;
+
+        ErrorMessage = null;
+        SuccessMessage = null;
+
+        if (!OrderItems.Any())
+        {
+            ErrorMessage = "Nincs aktív foglalás.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(BillingForm.FullName) ||
+            string.IsNullOrWhiteSpace(BillingForm.Email) ||
+            string.IsNullOrWhiteSpace(BillingForm.Phone) ||
+            string.IsNullOrWhiteSpace(BillingForm.PostalCode) ||
+            string.IsNullOrWhiteSpace(BillingForm.City) ||
+            string.IsNullOrWhiteSpace(BillingForm.Address))
+        {
+            ErrorMessage = "Kérlek tölts ki minden kötelező mezőt.";
+            return;
+        }
+
+        if (!new EmailAddressAttribute().IsValid(BillingForm.Email))
+        {
+            ErrorMessage = "Az e-mail cím formátuma nem megfelelő.";
+            return;
+        }
+
+        isSubmitting = true;
+
+        try
+        {
+            var billing = new BillingDetailsModel
+            {
+                FullName = BillingForm.FullName,
+                Email = BillingForm.Email,
+                Phone = BillingForm.Phone,
+                PostalCode = BillingForm.PostalCode,
+                City = BillingForm.City,
+                Address = BillingForm.Address,
+                VatNumber = BillingForm.VatNumber,
+                PaymentMethod = PaymentMethod.CashOnDelivery
+            };
+
+            await OrderState.SetBillingDetailsAsync(billing);
+
+            var dto = new CreateRentalOrderDto
+            {
+                CustomerName = BillingForm.FullName,
+                CustomerEmail = BillingForm.Email,
+                CustomerPhone = BillingForm.Phone,
+                CustomerPostalCode = BillingForm.PostalCode,
+                CustomerCity = BillingForm.City,
+                CustomerAddress = BillingForm.Address,
+                VatNumber = BillingForm.VatNumber,
+                PaymentMethod = "manual",
+                RentalStartDate = OrderItems.Min(i => i.RentalStartDate),
+                RentalEndDate = OrderItems.Max(i => i.RentalEndDate),
+                Items = OrderItems.Select(i => new RentalOrderItem
+                {
+                    RentalItemId = i.RentalItemId,
+                    Name = i.Name,
+                    Quantity = i.Quantity,
+                    Price = i.Price,
+                    RentalStartDate = i.RentalStartDate,
+                    RentalEndDate = i.RentalEndDate
+                }).ToList()
+            };
+
+            var order = await RentalService.CreateOrderAsync(dto);
+            await OrderState.ClearOrderAsync();
+
+            SuccessMessage = $"Sikeres foglalás! Rendelés azonosító: #{order.Id}";
+
+            RedirectBack();
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Hiba történt a foglalás mentésekor: {ex.Message}";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private sealed class BillingDetailsInputModel
+    {
+        [Required(ErrorMessage = "A név kötelező.")]
+        public string FullName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Az e-mail kötelező.")]
+        [EmailAddress(ErrorMessage = "Érvénytelen e-mail formátum.")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "A telefonszám kötelező.")]
+        public string Phone { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Az irányítószám kötelező.")]
+        public string PostalCode { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "A város kötelező.")]
+        public string City { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "A cím kötelező.")]
+        public string Address { get; set; } = string.Empty;
+
+        public string VatNumber { get; set; } = string.Empty;
+    }
+}
