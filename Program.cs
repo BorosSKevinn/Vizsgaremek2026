@@ -1,4 +1,5 @@
 using Vizsgaremek2026.Components;
+using Vizsgaremek2026.Services;
 
 namespace Vizsgaremek2026
 {
@@ -11,6 +12,9 @@ namespace Vizsgaremek2026
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+
+            builder.Services.AddScoped<ReviewService>();
+            builder.Services.AddScoped<HttpClient>();
 
             var app = builder.Build();
 

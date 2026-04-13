@@ -1,0 +1,72 @@
+﻿@using Vizsgaremek2026.Services
+@inject ReviewService ReviewService
+
+<div class="review-form">
+    <form @onsubmit="SubmitAsync" @onsubmit:preventDefault>
+        <input type="text" placeholder="Neved" @bind="name" required />
+        <textarea placeholder="Írd meg a véleményed..." @bind="comment" required></textarea>
+
+        <div class="rating-stars">
+            @for (int i = 1; i <= 5; i++)
+            {
+                var idx = i;
+                var isFilled = hover > 0 ? idx <= hover : idx <= rating;
+
+                <span @key="idx"
+                      class="star @(isFilled ? "filled" : "")"
+                      @onclick="() => SelectRating(idx)"
+                      @onmouseover="() => Hover(idx)"
+                      @onmouseout="ClearHover">
+                    ★
+                </span>
+            }
+
+            <span class="rating-text">@((hover > 0 ? hover : rating)) / 5</span>
+        </div>
+
+        <button type="submit">Küldés</button>
+    </form>
+
+    @if (submitted)
+    {
+        <p class="thankyou">Köszönjük a visszajelzésed! 🙏</p>
+    }
+</div>
+
+@code {
+    [Parameter] public EventCallback OnReviewSubmitted { get; set; }
+
+    private string name;
+    private string comment;
+    private bool submitted;
+    private int rating = 5;
+    private int hover;
+
+    private void SelectRating(int value)
+    {
+        rating = Math.Clamp(value, 1, 5);
+        hover = 0;
+    }
+
+    private void Hover(int value)
+    {
+        hover = Math.Clamp(value, 1, 5);
+    }
+
+    private void ClearHover()
+    {
+        hover = 0;
+    }
+
+    private async Task SubmitAsync()
+    {
+        rating = Math.Clamp(rating, 1, 5);
+        await ReviewService.AddReviewAsync(name, comment, rating);
+        name = comment = "";
+        rating = 5;
+        submitted = true;
+        await OnReviewSubmitted.InvokeAsync();
+        await Task.Delay(2500);
+        submitted = false;
+    }
+}

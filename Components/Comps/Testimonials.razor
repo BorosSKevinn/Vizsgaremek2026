@@ -1,5 +1,112 @@
-﻿<h3>Testimonials</h3>
+﻿@using Vizsgaremek2026.Services
+    <section class="testimonials" @attributes="AdditionalAttributes">
+        <div class="testimonials-container">
+
+            <header class="section-heading observe-animate fade-slide-right">
+                <h2>Mit mondanak <em>vendégeink</em></h2>
+                <span>valódi visszajelzések az edzésekről</span>
+            </header>
+
+            @if (reviews == null)
+            {
+            <p style="text-align:center;">Töltés...</p>
+            }
+            else if (reviews.Count == 0)
+            {
+            <p style="text-align:center;">Még nincsenek vélemények.</p>
+            }
+            else
+            {
+            <div class="testimonials-wrapper">
+                <button class="arrow left" @onclick="PrevPage">‹</button>
+
+                <div class="testimonials-grid">
+                    @foreach (var r in PagedReviews)
+                    {
+                    <article class="testimonial-card">
+                        <div class="testimonial-header">
+                            <img class="testimonial-avatar" src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&dpr=1" alt="@r.Name" />
+                            <div class="testimonial-person">
+                                <h4>@r.Name</h4>
+                                <span class="testimonial-role">@r.CreatedAt.ToString("yyyy.MM.dd")</span>
+                            </div>
+                        </div>
+
+                        <blockquote class="testimonial-quote">
+                            "@r.Comment"
+                        </blockquote>
+
+                        <div class="testimonial-stars">
+                            @for (int i = 0; i < 5; i++)
+                            {
+                            var filled = i < r.Rating;
+                            <span @key="i" class="star @(filled ? " filled" : "" )" title="@r.Rating/5"></span>
+                            }
+                        </div>
+                    </article>
+                    }
+                </div>
+
+                <button class="arrow right" @onclick="NextPage">›</button>
+            </div>
+            }
+
+            <div class="review-button-container">
+                <button class="review-button" @onclick="ToggleForm">
+                    @(showForm ? "Mégse" : "✍️ Vélemény írása")
+                </button>
+            </div>
+
+            @if (showForm)
+            {
+            <div class="review-form-container">
+                <ReviewForm OnReviewSubmitted="ReloadReviews" />
+            </div>
+            }
+
+        </div>
+    </section>
+
+@inject ReviewService ReviewService
 
 @code {
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
+    private List<(string Name, string Comment, int Rating, DateTime CreatedAt)> reviews;
+    private int currentPage = 0;
+    private const int pageSize = 3;
+    private bool showForm = false;
+
+    private IEnumerable<(string Name, string Comment, int Rating, DateTime CreatedAt)> PagedReviews =>
+        reviews?.Skip(currentPage * pageSize).Take(pageSize) ?? Enumerable.Empty<(string, string, int, DateTime)>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        reviews = await ReviewService.GetReviewsAsync();
+    }
+
+    private void NextPage()
+    {
+        if ((currentPage + 1) * pageSize < reviews.Count)
+            currentPage++;
+    }
+
+    private void PrevPage()
+    {
+        if (currentPage > 0)
+            currentPage--;
+    }
+
+    private void ToggleForm()
+    {
+        showForm = !showForm;
+    }
+
+    private async Task ReloadReviews()
+    {
+        reviews = await ReviewService.GetReviewsAsync();
+        showForm = false;
+        StateHasChanged();
+    }
 }

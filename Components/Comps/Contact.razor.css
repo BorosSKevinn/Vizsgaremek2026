@@ -1,2 +1,194 @@
-﻿body {
+﻿.callback-form {
+    margin-top: 140px;
+    font-family: 'Poppins', sans-serif;
+    background: radial-gradient(1200px 400px at 20% -20%, rgba(164,198,57,.18), transparent 60%), radial-gradient(800px 300px at 120% 0%, rgba(164,198,57,.12), transparent 60%);
+    padding: 80px 0;
+}
+
+.callback-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.section-heading {
+    text-align: center;
+    margin-bottom: 36px;
+}
+
+    .section-heading h2 {
+        font-size: 36px;
+        font-weight: 600;
+        color: #1e1e1e;
+        margin: 0;
+    }
+
+        .section-heading h2 em {
+            font-style: normal;
+            color: var(--primary-color);
+        }
+
+    .section-heading span {
+        display: block;
+        margin-top: 12px;
+        text-transform: uppercase;
+        font-size: 15px;
+        color: #666;
+        letter-spacing: 1px;
+    }
+
+.callback-card {
+    position: relative;
+    background: rgba(255,255,255,0.9);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.6);
+    border: 1px solid rgba(0,0,0,.04);
+}
+
+.callback-card-accent {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 5px;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    background: linear-gradient(90deg, var(--primary-color), #cfe992);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.form-field {
+    position: relative;
+}
+
+.form-field-textarea {
+    margin-top: 18px;
+}
+
+.form-input {
+    width: 100%;
+    background: #fff;
+    border: 1px solid #e6e8ef;
+    border-radius: 14px;
+    padding: 18px 44px 18px 48px;
+    font-size: 14px;
+    color: #333;
+    box-sizing: border-box;
+    transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+
+.form-field-textarea .form-input {
+    padding: 18px 44px 18px 48px;
+    resize: vertical;
+    min-height: 140px;
+}
+
+.form-label {
+    position: absolute;
+    left: 48px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    font-size: 14px;
+    pointer-events: none;
+    transition: all .18s ease;
+    background: transparent;
+    padding: 0 .25rem;
+}
+
+.form-field-textarea .form-label {
+    top: 22px;
+    transform: none;
+}
+
+.form-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #bbb;
+}
+
+.form-field-textarea .form-icon {
+    top: 28px;
+    transform: none;
+}
+
+.form-icon svg {
+    width: 20px;
+    height: 20px;
+    fill: #aab0b3;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(var(--primary-color),.18);
+}
+
+    .form-input:focus + .form-label,
+    .form-input:not(:placeholder-shown) + .form-label {
+        top: 0;
+        transform: translateY(-50%) scale(.85);
+        background: rgba(255,255,255,0.9);
+        color: var(--primary-color);
+        padding: 0 .35rem;
+        margin-left: -0.35rem;
+    }
+
+.form-input:invalid:not(:placeholder-shown) {
+    border-color: #ef9a9a;
+}
+
+    .form-input:invalid:not(:placeholder-shown):focus {
+        box-shadow: 0 0 0 4px rgba(239,154,154,.25);
+    }
+
+.callback-btn {
+    margin-top: 22px;
+    display: inline-block;
+    background: var(--primary-color);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    padding: 12px 30px;
+    border-radius: 30px;
+    border: 2px solid var(--primary-color);
+    cursor: pointer;
+    transition: .22s ease;
+}
+
+    .callback-btn:hover {
+        background: #fff;
+        color: var(--primary-color);
+    }
+
+@media (max-width: 992px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+.consent {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+}
+
+.field-full {
+    grid-column: 1 / -1;
 }
