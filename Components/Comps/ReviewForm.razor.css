@@ -97,18 +97,12 @@
 }
 
     .rating-stars .star {
-        color: #ccc; 
-        
-        
-        
-        alap szín */
+        color: #ccc;
         cursor: pointer;
         transition: transform .12s ease;
     }
 
-        .rating-stars .star.filled { 
-            
-            CSAK ez színez */
+        .rating-stars .star.filled {
             color: var(--primary-color);
         }
 
