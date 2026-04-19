@@ -8,7 +8,7 @@ namespace Vizsgaremek2026.Services
         Task SetBillingDetailsAsync(BillingDetailsModel? billingDetails);
         Task<List<OrderItem>> GetOrderItemsAsync();
         Task SetOrderItemsAsync(List<OrderItem> items);
-        Task AddRentalItemAsync(int rentalItemId, string name, decimal pricePerDay, DateTime startDate, DateTime endDate, int quantity = 1);
+        Task AddRentalItemAsync(int rentalItemId, string name, decimal pricePerSession, DateTime startDate, DateTime endDate, int quantity = 1);
         Task ClearOrderAsync();
         Task<decimal> GetTotalAsync();
     }
@@ -94,7 +94,7 @@ namespace Vizsgaremek2026.Services
             }
         }
 
-        public async Task AddRentalItemAsync(int rentalItemId, string name, decimal pricePerDay, DateTime startDate, DateTime endDate, int quantity = 1)
+        public async Task AddRentalItemAsync(int rentalItemId, string name, decimal pricePerSession, DateTime startDate, DateTime endDate, int quantity = 1)
         {
             if (quantity < 1)
             {
@@ -108,7 +108,7 @@ namespace Vizsgaremek2026.Services
                 throw new ArgumentException("A végdátum nem lehet korábbi a kezdő dátumnál.");
             }
 
-            var totalPrice = pricePerDay * quantity;
+            var totalPrice = pricePerSession * quantity;
 
             await _gate.WaitAsync();
             try

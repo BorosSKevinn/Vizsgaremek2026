@@ -71,10 +71,10 @@ namespace Vizsgaremek2026.Services
                     throw new InvalidOperationException($"{rentalItem.Name} nem elérhető a választott időpontban.");
                 }
 
-                totalAmount += rentalItem.PricePerDay * item.Quantity;
+                totalAmount += rentalItem.PricePerSession * item.Quantity;
 
                 item.Name = rentalItem.Name;
-                item.Price = rentalItem.PricePerDay * item.Quantity;
+                item.Price = rentalItem.PricePerSession * item.Quantity;
                 item.RentalStartDate = start;
                 item.RentalEndDate = end;
             }
@@ -91,7 +91,7 @@ namespace Vizsgaremek2026.Services
                 RentalStartDate = orderDto.RentalStartDate,
                 RentalEndDate = orderDto.RentalEndDate,
                 Quantity = orderDto.Items.Sum(i => i.Quantity),
-                PricePerDay = orderDto.Items.Count == 0 ? 0 : totalAmount / orderDto.Items.Count,
+                PricePerSession = orderDto.Items.Count == 0 ? 0 : totalAmount / orderDto.Items.Count,
                 TotalAmount = totalAmount,
                 PaymentMethod = string.IsNullOrWhiteSpace(orderDto.PaymentMethod) ? "manual" : orderDto.PaymentMethod,
                 PaymentStatus = "pending",

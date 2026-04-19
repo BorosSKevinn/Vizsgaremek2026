@@ -31,7 +31,7 @@ namespace Vizsgaremek2026.Services
         public async Task<RentalItem?> GetRentalItemAsync(int id)
         {
             const string sql = @"
-SELECT Id, Name, Category, Capacity, PricePerDay, Rating, Tags, Description, ImageUrl, IsActive, CreatedAt
+SELECT Id, Name, Category, Capacity, PricePerSession, Rating, Tags, Description, ImageUrl, IsActive, CreatedAt
 FROM RentalItems
 WHERE Id = @Id AND IsActive = 1
 LIMIT 1;";
@@ -49,7 +49,7 @@ LIMIT 1;";
         public async Task<List<RentalItem>> GetAllRentalItemsAsync()
         {
             const string sql = @"
-SELECT Id, Name, Category, Capacity, PricePerDay, Rating, Tags, Description, ImageUrl, IsActive, CreatedAt
+SELECT Id, Name, Category, Capacity, PricePerSession, Rating, Tags, Description, ImageUrl, IsActive, CreatedAt
 FROM RentalItems
 WHERE IsActive = 1
 ORDER BY Category, Name;";
@@ -76,16 +76,16 @@ ORDER BY Category, Name;";
 INSERT INTO RentalOrders (
     CustomerName, CustomerEmail, CustomerPhone, CustomerAddress,
     CustomerCity, CustomerPostalCode, VatNumber,
-    Quantity, PricePerDay, TotalAmount,
+    Quantity, PricePerSession, TotalAmount,
     PaymentMethod, StripeSessionId, StripePaymentIntentId,
-    Status, Notes, CreatedAt, UpdatedAt, PaidAt
+    Status, Notes, CreatedAt
 )
 VALUES (
     @CustomerName, @CustomerEmail, @CustomerPhone, @CustomerAddress,
     @CustomerCity, @CustomerPostalCode, @VatNumber,
-    @Quantity, @PricePerDay, @TotalAmount,
+    @Quantity, @PricePerSession, @TotalAmount,
     @PaymentMethod, @StripeSessionId, @StripePaymentIntentId,
-    @Status, @Notes, @CreatedAt, @UpdatedAt, @PaidAt
+    @Status, @Notes, @CreatedAt
 );
 SELECT LAST_INSERT_ID();";
 
@@ -298,7 +298,7 @@ GROUP BY roi.RentalStartDate;";
                 Name = reader["Name"]?.ToString() ?? string.Empty,
                 Category = reader["Category"]?.ToString() ?? string.Empty,
                 Capacity = Convert.ToInt32(reader["Capacity"]),
-                PricePerDay = Convert.ToDecimal(reader["PricePerDay"]),
+                PricePerSession = Convert.ToDecimal(reader["PricePerSession"]),
                 Rating = Convert.ToDouble(reader["Rating"]),
                 Tags = tags,
                 Description = reader["Description"]?.ToString() ?? string.Empty,
@@ -318,7 +318,7 @@ GROUP BY roi.RentalStartDate;";
             cmd.Parameters.AddWithValue("@CustomerPostalCode", order.CustomerPostalCode);
             cmd.Parameters.AddWithValue("@VatNumber", order.VatNumber);
             cmd.Parameters.AddWithValue("@Quantity", order.Quantity);
-            cmd.Parameters.AddWithValue("@PricePerDay", order.PricePerDay);
+            cmd.Parameters.AddWithValue("@PricePerSession", order.PricePerSession);
             cmd.Parameters.AddWithValue("@TotalAmount", order.TotalAmount);
             cmd.Parameters.AddWithValue("@PaymentMethod", order.PaymentMethod);
             cmd.Parameters.AddWithValue("@StripeSessionId", (object?)order.StripeSessionId ?? DBNull.Value);
@@ -326,8 +326,6 @@ GROUP BY roi.RentalStartDate;";
             cmd.Parameters.AddWithValue("@Status", order.Status);
             cmd.Parameters.AddWithValue("@Notes", (object?)order.Notes ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@CreatedAt", order.CreatedAt);
-            cmd.Parameters.AddWithValue("@UpdatedAt", (object?)order.UpdatedAt ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@PaidAt", (object?)order.PaidAt ?? DBNull.Value);
         }
     }
 }

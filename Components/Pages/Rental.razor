@@ -54,7 +54,7 @@
                             <img src="@GetPexelsImage(item.ImageUrl)" alt="@item.Name">
                             <div class="card-badges">
                                 <span class="badge badge-cat">@item.Category</span>
-                                <span class="badge">@(item.PricePerDay.ToString("0")) Ft / alkalom</span>
+                                <span class="badge">@(item.PricePerSession.ToString("0")) Ft / alkalom</span>
                             </div>
                         </div>
 
@@ -109,7 +109,7 @@
                         <img src="@GetPexelsImage(Selected.ImageUrl)" alt="@Selected.Name">
                         <div>
                             <h4>@Selected.Name</h4>
-                            <div class="booking-price"><strong>@Selected.PricePerDay.ToString("0") Ft</strong> / alkalom</div>
+                            <div class="booking-price"><strong>@Selected.PricePerSession.ToString("0") Ft</strong> / alkalom</div>
                             <div class="booking-meta">@Selected.Category • Max létszám: @Selected.Capacity</div>
                         </div>
                     </div>
@@ -348,7 +348,7 @@
             return;
         }
 
-        await OrderState.AddRentalItemAsync(Selected.Id, Selected.Name, Selected.PricePerDay, bookFrom.Value, bookTo.Value, bookGuests);
+        await OrderState.AddRentalItemAsync(Selected.Id, Selected.Name, Selected.PricePerSession, bookFrom.Value, bookTo.Value, bookGuests);
         Navigation.NavigateTo("/szamlazasi-adatok");
     }
 
@@ -398,7 +398,7 @@
                                       && bookTo.HasValue
                                       && bookGuests >= 1
                                       && bookGuests <= Selected.Capacity;
-    private decimal SelectedSubtotal => Selected is null ? 0 : Selected.PricePerDay * bookGuests;
+    private decimal SelectedSubtotal => Selected is null ? 0 : Selected.PricePerSession * bookGuests;
     private decimal SelectedVat => SelectedSubtotal * 0.27m;
     private decimal SelectedTotal => SelectedSubtotal + SelectedVat;
 

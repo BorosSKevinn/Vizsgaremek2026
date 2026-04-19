@@ -16,7 +16,7 @@ namespace Vizsgaremek2026.Models
         
         public int Capacity { get; set; }
         
-        public decimal PricePerDay { get; set; }
+        public decimal PricePerSession { get; set; }
         
         public double Rating { get; set; }
         
@@ -73,7 +73,7 @@ namespace Vizsgaremek2026.Models
         
         public int Quantity { get; set; } = 1;
         
-        public decimal PricePerDay { get; set; }
+        public decimal PricePerSession { get; set; }
         
         public decimal TotalAmount { get; set; }
         
@@ -103,7 +103,6 @@ namespace Vizsgaremek2026.Models
         public string? Notes { get; set; }
         
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime? UpdatedAt { get; set; }
         public DateTime? PaidAt { get; set; }
         public DateTime? PaymentCompletedAt { get; set; }
         
